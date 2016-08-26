@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.Mvc
 {
-    public class MiddlewareFilterBuilderServiceTest
+    public class MiddlewareFilterBuilderTest
     {
         [Fact]
         public void GetPipeline_CallsInto_Configure()
@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.Mvc
             // Arrange
             var services = new ServiceCollection();
             var appBuilder = new ApplicationBuilder(services.BuildServiceProvider());
-            var pipelineBuilderService = new MiddlewareFilterBuilderService(new MiddlewareFilterConfigurationProvider());
+            var pipelineBuilderService = new MiddlewareFilterBuilder(new MiddlewareFilterConfigurationProvider());
             pipelineBuilderService.ApplicationBuilder = appBuilder;
             var configureCount = 0;
             Pipeline1.ConfigurePipeline = (ab) =>
@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.Mvc
             // Arrange
             var services = new ServiceCollection();
             var appBuilder = new ApplicationBuilder(services.BuildServiceProvider());
-            var pipelineBuilderService = new MiddlewareFilterBuilderService(new MiddlewareFilterConfigurationProvider());
+            var pipelineBuilderService = new MiddlewareFilterBuilder(new MiddlewareFilterConfigurationProvider());
             pipelineBuilderService.ApplicationBuilder = appBuilder;
             var configureCount = 0;
             Pipeline1.ConfigurePipeline = (ab) =>
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.Mvc
             // Arrange
             var services = new ServiceCollection();
             var appBuilder = new ApplicationBuilder(services.BuildServiceProvider());
-            var pipelineBuilderService = new MiddlewareFilterBuilderService(new MiddlewareFilterConfigurationProvider());
+            var pipelineBuilderService = new MiddlewareFilterBuilder(new MiddlewareFilterConfigurationProvider());
             pipelineBuilderService.ApplicationBuilder = appBuilder;
             Pipeline1.ConfigurePipeline = (ab) =>
             {
@@ -95,7 +95,7 @@ namespace Microsoft.AspNetCore.Mvc
             Assert.NotNull(pipeline);
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => pipeline(new DefaultHttpContext()));
             Assert.Equal(
-                "Could not find IMiddlewareFilterFeature in the feature list.",
+                "Could not find 'IMiddlewareFilterFeature' in the feature list.",
                 exception.Message);
         }
 
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.Mvc
             // Arrange
             var services = new ServiceCollection();
             var appBuilder = new ApplicationBuilder(services.BuildServiceProvider());
-            var pipelineBuilderService = new MiddlewareFilterBuilderService(new MiddlewareFilterConfigurationProvider());
+            var pipelineBuilderService = new MiddlewareFilterBuilder(new MiddlewareFilterConfigurationProvider());
             pipelineBuilderService.ApplicationBuilder = appBuilder;
             Pipeline1.ConfigurePipeline = (ab) =>
             {

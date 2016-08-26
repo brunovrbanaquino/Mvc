@@ -5,13 +5,14 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Core;
 
 namespace Microsoft.AspNetCore.Mvc.Internal
 {
     /// <summary>
     /// Builds a middleware pipeline after receiving the pipeline from a pipeline provider
     /// </summary>
-    public class MiddlewareFilterBuilderService
+    public class MiddlewareFilterBuilder
     {
         private readonly ConcurrentDictionary<Type, Lazy<RequestDelegate>> _pipelinesCache
             = new ConcurrentDictionary<Type, Lazy<RequestDelegate>>();
@@ -19,17 +20,17 @@ namespace Microsoft.AspNetCore.Mvc.Internal
 
         public IApplicationBuilder ApplicationBuilder { get; set; }
 
-        public MiddlewareFilterBuilderService(MiddlewareFilterConfigurationProvider middlewareFilterConfigurationProvider)
+        public MiddlewareFilterBuilder(MiddlewareFilterConfigurationProvider middlewareFilterConfigurationProvider)
         {
             _configurationProvider = middlewareFilterConfigurationProvider;
         }
 
-        public RequestDelegate GetPipeline(Type middlewarePipelineProviderType)
+        public RequestDelegate GetPipeline(Type configurationType)
         {
             // Build the pipeline only once. This is similar to how middlewares registered in Startup are constructed.
 
             var requestDelegate = _pipelinesCache.GetOrAdd(
-                middlewarePipelineProviderType,
+                configurationType,
                 key => new Lazy<RequestDelegate>(() => BuildPipeline(key)));
 
             return requestDelegate.Value;
@@ -39,7 +40,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
         {
             if (ApplicationBuilder == null)
             {
-                throw new InvalidOperationException($"{ApplicationBuilder} property cannot be null.");
+                throw new InvalidOperationException(
+                    Resources.FormatMiddlewareFilterBuilder_NullApplicationBuilder(nameof(ApplicationBuilder)));
             }
 
             var nestedAppBuilder = ApplicationBuilder.New();
@@ -59,7 +61,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 var feature = httpContext.Features.Get<IMiddlewareFilterFeature>();
                 if (feature == null)
                 {
-                    throw new InvalidOperationException($"Could not find {nameof(IMiddlewareFilterFeature)} in the feature list.");
+                    throw new InvalidOperationException(
+                        Resources.FormatMiddlewareFilterBuilder_NoMiddlewareFeature(nameof(IMiddlewareFilterFeature)));
                 }
 
                 var resourceExecutionDelegate = feature.ResourceExecutionDelegate;

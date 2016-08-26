@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.Mvc.Filters
+namespace Microsoft.AspNetCore.Mvc
 {
     /// <summary>
-    /// Executes a middleware pipeline provided the by the <see cref="MiddlewareFilterAttribute.PipelineConfiguringType"/>.
+    /// Executes a middleware pipeline provided the by the <see cref="MiddlewareFilterAttribute.ConfigurationType"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class MiddlewareFilterAttribute : Attribute, IFilterFactory, IOrderedFilter
@@ -16,18 +17,18 @@ namespace Microsoft.AspNetCore.Mvc.Filters
         /// <summary>
         /// Instantiates a new instance of <see cref="MiddlewareFilterAttribute"/>.
         /// </summary>
-        /// <param name="pipelineConfiguringType">A type which configures a middleware pipeline</param>
-        public MiddlewareFilterAttribute(Type pipelineConfiguringType)
+        /// <param name="configurationType">A type which configures a middleware pipeline</param>
+        public MiddlewareFilterAttribute(Type configurationType)
         {
-            if (pipelineConfiguringType == null)
+            if (configurationType == null)
             {
-                throw new ArgumentNullException(nameof(pipelineConfiguringType));
+                throw new ArgumentNullException(nameof(configurationType));
             }
 
-            PipelineConfiguringType = pipelineConfiguringType;
+            ConfigurationType = configurationType;
         }
 
-        public Type PipelineConfiguringType { get; }
+        public Type ConfigurationType { get; }
 
         /// <inheritdoc />
         public int Order { get; set; }
@@ -42,8 +43,8 @@ namespace Microsoft.AspNetCore.Mvc.Filters
                 throw new ArgumentNullException(nameof(serviceProvider));
             }
 
-            var middlewarePipelineService = serviceProvider.GetRequiredService<MiddlewareFilterBuilderService>();
-            var pipeline = middlewarePipelineService.GetPipeline(PipelineConfiguringType);
+            var middlewarePipelineService = serviceProvider.GetRequiredService<MiddlewareFilterBuilder>();
+            var pipeline = middlewarePipelineService.GetPipeline(ConfigurationType);
 
             return new MiddlewareFilter(pipeline);
         }

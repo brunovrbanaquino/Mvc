@@ -354,7 +354,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
         {
             var applicationServices = new ServiceCollection();
             var applicationBuilder = new ApplicationBuilder(applicationServices.BuildServiceProvider());
-            var middlewareFilterBuilderService = new MiddlewareFilterBuilderService(
+            var middlewareFilterBuilderService = new MiddlewareFilterBuilder(
                 new MiddlewareFilterConfigurationProvider());
             middlewareFilterBuilderService.ApplicationBuilder = applicationBuilder;
             return middlewareFilterBuilderService.GetPipeline(middlewarePipelineProviderType);

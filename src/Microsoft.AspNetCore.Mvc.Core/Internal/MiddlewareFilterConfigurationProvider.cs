@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Core;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.Mvc.Internal
@@ -45,7 +46,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             if (selectedMethods.Count > 1)
             {
                 throw new InvalidOperationException(
-                    string.Format("Having multiple overloads of method '{0}' is not supported.", methodName));
+                    Resources.FormatMiddewareFilter_ConfigureMethodOverload(methodName));
             }
 
             var methodInfo = selectedMethods.FirstOrDefault();
@@ -54,8 +55,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 if (required)
                 {
                     throw new InvalidOperationException(
-                        string.Format(
-                            "A public method named '{0}' could not be found in the '{1}' type.",
+                        Resources.FormatMiddewareFilter_NoConfigureMethod(
                             methodName,
                             startupType.FullName));
 
@@ -67,8 +67,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 if (required)
                 {
                     throw new InvalidOperationException(
-                        string.Format(
-                            "The '{0}' method in the type '{1}' must have a return type of '{2}'.",
+                        Resources.FormatMiddlewareFilter_InvalidConfigureReturnType(
                             methodInfo.Name,
                             startupType.FullName,
                             returnType.Name));
@@ -112,12 +111,13 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                         }
                         catch (Exception ex)
                         {
-                            throw new InvalidOperationException(string.Format(
-                                "Could not resolve a service of type '{0}' for the parameter '{1}' of method '{2}' on type '{3}'.",
-                                parameterInfo.ParameterType.FullName,
-                                parameterInfo.Name,
-                                MethodInfo.Name,
-                                MethodInfo.DeclaringType.FullName), ex);
+                            throw new InvalidOperationException(
+                                Resources.FormatMiddlewareFilter_ServiceResolutionFail(
+                                    parameterInfo.ParameterType.FullName,
+                                    parameterInfo.Name,
+                                    MethodInfo.Name,
+                                    MethodInfo.DeclaringType.FullName),
+                                ex);
                         }
                     }
                 }

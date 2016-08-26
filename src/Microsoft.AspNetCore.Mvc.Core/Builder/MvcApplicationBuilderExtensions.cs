@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.Builder
                     "ConfigureServices(...)"));
             }
 
-            var middlewarePipelineBuilder = app.ApplicationServices.GetRequiredService<MiddlewareFilterBuilderService>();
+            var middlewarePipelineBuilder = app.ApplicationServices.GetRequiredService<MiddlewareFilterBuilder>();
             middlewarePipelineBuilder.ApplicationBuilder = app.New();
 
             var routes = new RouteBuilder(app)

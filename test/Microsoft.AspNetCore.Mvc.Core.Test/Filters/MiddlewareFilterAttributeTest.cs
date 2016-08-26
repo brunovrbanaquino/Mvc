@@ -4,7 +4,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder.Internal;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -18,9 +17,9 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             // Arrange
             var middlewareFilterAttribute = new MiddlewareFilterAttribute(typeof(Pipeline1));
             var services = new ServiceCollection();
-            services.AddSingleton(new MiddlewareFilterBuilderService(new MiddlewareFilterConfigurationProvider()));
+            services.AddSingleton(new MiddlewareFilterBuilder(new MiddlewareFilterConfigurationProvider()));
             var serviceProvider = services.BuildServiceProvider();
-            var filterBuilderService = serviceProvider.GetRequiredService<MiddlewareFilterBuilderService>();
+            var filterBuilderService = serviceProvider.GetRequiredService<MiddlewareFilterBuilder>();
             filterBuilderService.ApplicationBuilder = new ApplicationBuilder(serviceProvider);
             var configureCallCount = 0;
             Pipeline1.ConfigurePipeline = (ab) =>
